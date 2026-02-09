@@ -187,27 +187,29 @@ const Dashboard = ({ initialData, onReset }: { initialData: OnboardingData; onRe
               </Card>
             </motion.div>
 
-            {/* AI Recommendations */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <Card className="border-border/50 shadow-md">
-                <CardHeader>
-                  <CardTitle className="text-lg font-display flex items-center gap-2">
-                    <span className="text-xl">💡</span>
-                    AI Recommendations
-                  </CardTitle>
-                  <CardDescription>Personalized insights from our agents</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Recommendations recommendations={budgetPlan.recommendations} />
-                </CardContent>
-              </Card>
-            </motion.div>
           </div>
         </div>
+
+        {/* AI Tips Section - Bottom of Dashboard */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mt-8"
+        >
+          <Card className="border-border/50 shadow-md bg-gradient-to-r from-primary/5 to-accent/5">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-display flex items-center gap-2">
+                <span className="text-xl">💡</span>
+                AI Budget Tips
+              </CardTitle>
+              <CardDescription>Personalized recommendations from our AI agents to improve your finances</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Recommendations recommendations={budgetPlan.recommendations} />
+            </CardContent>
+          </Card>
+        </motion.section>
       </main>
 
       {/* Footer */}
