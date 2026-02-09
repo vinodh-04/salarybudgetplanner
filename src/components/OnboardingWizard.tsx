@@ -162,7 +162,7 @@ const EXPENSE_CATEGORIES = [
 ];
 
 export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0); // Start at intro page (step 0)
   const [monthlySalary, setMonthlySalary] = useState('');
   const [otherIncome, setOtherIncome] = useState('');
   const [emis, setEmis] = useState<EMI[]>([]);
@@ -180,8 +180,8 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const [newGoalPercentage, setNewGoalPercentage] = useState('15');
 
   const totalSteps = 7;
-  const currentAgent = AGENTS[step - 1];
-  const AgentIcon = currentAgent.icon;
+  const currentAgent = step > 0 ? AGENTS[step - 1] : null;
+  const AgentIcon = currentAgent?.icon;
 
   // Calculated values
   const totalIncome = (parseFloat(monthlySalary) || 0) + (parseFloat(otherIncome) || 0);
@@ -822,6 +822,109 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
     }
   };
 
+  // Intro page (step 0)
+  if (step === 0) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, type: "spring" }}
+          className="text-center space-y-12"
+        >
+          {/* Neon Title */}
+          <motion.h1
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="text-4xl md:text-6xl lg:text-7xl font-display font-bold tracking-tight"
+            style={{
+              background: 'linear-gradient(135deg, #00ff88, #00d4ff, #ff00ff, #ffff00)',
+              backgroundSize: '300% 300%',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              animation: 'neonGradient 3s ease infinite',
+              textShadow: '0 0 30px rgba(0, 255, 136, 0.5), 0 0 60px rgba(0, 212, 255, 0.3), 0 0 90px rgba(255, 0, 255, 0.2)',
+              filter: 'drop-shadow(0 0 20px rgba(0, 255, 136, 0.4))',
+            }}
+          >
+            MINI BUDGET PLANNER
+            <br />
+            <span className="text-3xl md:text-5xl lg:text-6xl">WITH AGENTIC AI</span>
+          </motion.h1>
+
+          {/* Neon glow effect decoration */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="flex justify-center gap-4"
+          >
+            {[...Array(5)].map((_, i) => (
+              <motion.div
+                key={i}
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.5, 1, 0.5],
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                }}
+                className="w-3 h-3 rounded-full"
+                style={{
+                  background: ['#00ff88', '#00d4ff', '#ff00ff', '#ffff00', '#00ff88'][i],
+                  boxShadow: `0 0 20px ${['#00ff88', '#00d4ff', '#ff00ff', '#ffff00', '#00ff88'][i]}, 0 0 40px ${['#00ff88', '#00d4ff', '#ff00ff', '#ffff00', '#00ff88'][i]}`,
+                }}
+              />
+            ))}
+          </motion.div>
+
+          {/* Next Button with neon styling */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+          >
+            <Button
+              onClick={() => setStep(1)}
+              size="lg"
+              className="text-lg px-12 py-6 h-auto font-display font-bold relative overflow-hidden group"
+              style={{
+                background: 'linear-gradient(135deg, #00ff88, #00d4ff)',
+                boxShadow: '0 0 30px rgba(0, 255, 136, 0.5), 0 0 60px rgba(0, 212, 255, 0.3)',
+                color: '#000',
+                border: '2px solid transparent',
+              }}
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                Get Started
+                <ArrowRight className="h-5 w-5" />
+              </span>
+              <motion.div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{
+                  background: 'linear-gradient(135deg, #00d4ff, #ff00ff)',
+                }}
+              />
+            </Button>
+          </motion.div>
+
+          {/* CSS for neon gradient animation */}
+          <style>{`
+            @keyframes neonGradient {
+              0%, 100% { background-position: 0% 50%; }
+              50% { background-position: 100% 50%; }
+            }
+          `}</style>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Main wizard steps (step 1-7)
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <motion.div
@@ -840,12 +943,12 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                 transition={{ type: "spring", stiffness: 200, damping: 15 }}
                 className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center"
               >
-                <AgentIcon className="h-6 w-6 text-blue-500" />
+                {AgentIcon && <AgentIcon className="h-6 w-6 text-blue-500" />}
               </motion.div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <Bot className="h-4 w-4 text-blue-500" />
-                  <h2 className="font-display font-bold text-blue-500">{currentAgent.name}</h2>
+                  <h2 className="font-display font-bold text-blue-500">{currentAgent?.name}</h2>
                 </div>
                 <p className="text-sm text-muted-foreground">Step {step} of {totalSteps}</p>
               </div>
@@ -881,7 +984,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                 <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
                   <div className="flex items-start gap-3">
                     <MessageSquare className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm">{currentAgent.purpose}</p>
+                    <p className="text-sm">{currentAgent?.purpose}</p>
                   </div>
                 </div>
 
@@ -910,6 +1013,11 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             <div className="flex justify-between mt-8 pt-6 border-t border-border/50">
               {step > 1 ? (
                 <Button variant="outline" onClick={handleBack}>
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back
+                </Button>
+              ) : step === 1 ? (
+                <Button variant="outline" onClick={() => setStep(0)}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back
                 </Button>
