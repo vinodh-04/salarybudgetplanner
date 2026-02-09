@@ -16,7 +16,8 @@ import {
   TrendingUp,
   Lightbulb,
   MessageSquare,
-  Bot
+  Bot,
+  Target
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,11 +39,19 @@ interface OtherExpense {
   category: string;
 }
 
+interface SavingsGoalInput {
+  id: string;
+  name: string;
+  targetAmount: number;
+  monthlyPercentage: number;
+}
+
 interface OnboardingData {
   monthlySalary: number;
   otherIncome: number;
   emis: EMI[];
   expenses: OtherExpense[];
+  goals: Array<{ name: string; targetAmount: number; monthlyPercentage: number }>;
 }
 
 interface OnboardingWizardProps {
@@ -83,16 +92,26 @@ const AGENTS = [
   },
   {
     id: 4,
+    name: "Goal Planning Agent",
+    icon: Target,
+    color: "text-pink-500",
+    bgColor: "bg-pink-500/10",
+    borderColor: "border-pink-500/30",
+    purpose: "Here is the Goal Planning Agent — it helps you set savings goals for things you want to buy. Add your dreams like a plot, car, or emergency fund, and this agent will track how long it takes to achieve them.",
+    inputType: "goals"
+  },
+  {
+    id: 5,
     name: "Budget Planning Agent",
     icon: Calculator,
     color: "text-emerald-500",
     bgColor: "bg-emerald-500/10",
     borderColor: "border-emerald-500/30",
-    purpose: "Here is the Budget Planning Agent — it creates optimized budget allocations based on your income and expenses. Review the analysis, then this agent will serve the data to the Prediction Agent.",
+    purpose: "This is the Budget Planning Agent — it creates optimized budget allocations based on your income, expenses, and goals. Review the analysis, then this agent will serve the data to the Prediction Agent.",
     inputType: "analysis"
   },
   {
-    id: 5,
+    id: 6,
     name: "Prediction Agent",
     icon: TrendingUp,
     color: "text-cyan-500",
@@ -102,7 +121,7 @@ const AGENTS = [
     inputType: "prediction"
   },
   {
-    id: 6,
+    id: 7,
     name: "Recommendation Agent",
     icon: Lightbulb,
     color: "text-orange-500",
@@ -148,6 +167,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const [otherIncome, setOtherIncome] = useState('');
   const [emis, setEmis] = useState<EMI[]>([]);
   const [expenses, setExpenses] = useState<OtherExpense[]>([]);
+  const [goals, setGoals] = useState<SavingsGoalInput[]>([]);
   
   // Temp states for adding new items
   const [newEmiName, setNewEmiName] = useState('');
@@ -155,8 +175,11 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const [newExpenseName, setNewExpenseName] = useState('');
   const [newExpenseAmount, setNewExpenseAmount] = useState('');
   const [newExpenseCategory, setNewExpenseCategory] = useState('other');
+  const [newGoalName, setNewGoalName] = useState('');
+  const [newGoalAmount, setNewGoalAmount] = useState('');
+  const [newGoalPercentage, setNewGoalPercentage] = useState('15');
 
-  const totalSteps = 6;
+  const totalSteps = 7;
   const currentAgent = AGENTS[step - 1];
   const AgentIcon = currentAgent.icon;
 
@@ -164,6 +187,8 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   const totalIncome = (parseFloat(monthlySalary) || 0) + (parseFloat(otherIncome) || 0);
   const totalEmiAmount = emis.reduce((sum, e) => sum + e.amount, 0);
   const totalExpenseAmount = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const totalGoalPercentage = goals.reduce((sum, g) => sum + g.monthlyPercentage, 0);
+  const totalGoalContribution = (totalIncome * totalGoalPercentage) / 100;
   const totalOutflow = totalEmiAmount + totalExpenseAmount;
   const remainingAfterAll = totalIncome - totalOutflow;
   const savingsRate = totalIncome > 0 ? ((remainingAfterAll / totalIncome) * 100) : 0;
@@ -211,6 +236,17 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         return { status: "pending", message: "⏳ Awaiting expense data...", details: "Add your monthly expenses for accurate analysis" };
       
       case 4:
+        if (goals.length > 0) {
+          const totalGoalAmount = goals.reduce((sum, g) => sum + g.targetAmount, 0);
+          return {
+            status: totalGoalPercentage <= 50 ? "success" : "warning",
+            message: `🎯 ${goals.length} goal(s) set! Monthly contribution: $${totalGoalContribution.toLocaleString()}`,
+            details: `${totalGoalPercentage}% of income allocated | Total targets: $${totalGoalAmount.toLocaleString()}`
+          };
+        }
+        return { status: "info", message: "ℹ️ No savings goals yet", details: "Add a goal to start tracking your dreams! You can skip if you prefer." };
+      
+      case 5:
         const healthScore = savingsRate >= 20 ? "Excellent" : savingsRate >= 10 ? "Good" : savingsRate >= 0 ? "Needs Improvement" : "Critical";
         const healthColor = savingsRate >= 20 ? "text-emerald-500" : savingsRate >= 10 ? "text-amber-500" : "text-destructive";
         return {
@@ -220,7 +256,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
           healthColor
         };
       
-      case 5:
+      case 6:
         const monthlyProjection = remainingAfterAll;
         const yearlyProjection = monthlyProjection * 12;
         const emergencyFundMonths = totalExpenseAmount > 0 ? Math.floor((yearlyProjection) / totalExpenseAmount) : 0;
@@ -234,7 +270,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             : "Consider reducing expenses or increasing income"
         };
       
-      case 6:
+      case 7:
         const tips: string[] = [];
         if (emiToIncomeRatio > 40) tips.push("💳 Consider refinancing high-interest loans");
         if (savingsRate < 20) tips.push("🎯 Target saving at least 20% of income");
@@ -242,6 +278,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
         if (foodExpense > totalIncome * 0.15) tips.push("🍳 Meal prep to reduce food costs");
         const entertainmentExpense = expenses.filter(e => e.category === 'entertainment').reduce((s, e) => s + e.amount, 0);
         if (entertainmentExpense > totalIncome * 0.1) tips.push("🎬 Audit subscriptions for unused services");
+        if (goals.length > 0) tips.push(`🏆 ${goals.length} goal(s) tracked with $${totalGoalContribution.toLocaleString()}/month allocated`);
         if (tips.length === 0) tips.push("✨ Great job! Your budget looks healthy");
         tips.push("💼 Explore side income: freelancing, tutoring, online work");
         
@@ -254,7 +291,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       default:
         return { status: "pending", message: "Loading...", details: "" };
     }
-  }, [step, totalIncome, otherIncome, monthlySalary, emis, expenses, totalEmiAmount, totalExpenseAmount, emiToIncomeRatio, savingsRate, remainingAfterAll, totalOutflow]);
+  }, [step, totalIncome, otherIncome, monthlySalary, emis, expenses, goals, totalEmiAmount, totalExpenseAmount, emiToIncomeRatio, savingsRate, remainingAfterAll, totalOutflow, totalGoalPercentage, totalGoalContribution]);
 
   const handleAddEmi = () => {
     const result = emiSchema.safeParse({
@@ -304,6 +341,41 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
     setExpenses(expenses.filter(e => e.id !== id));
   };
 
+  const handleAddGoal = () => {
+    if (!newGoalName.trim()) {
+      toast.error("Please enter a goal name");
+      return;
+    }
+    
+    const targetAmount = parseFloat(newGoalAmount) || 0;
+    const percentage = parseFloat(newGoalPercentage) || 0;
+    
+    if (targetAmount <= 0) {
+      toast.error("Please enter a valid target amount");
+      return;
+    }
+    
+    if (percentage <= 0 || percentage > 100) {
+      toast.error("Please enter a valid percentage (1-100)");
+      return;
+    }
+
+    setGoals([...goals, { 
+      id: generateId(), 
+      name: newGoalName.trim(), 
+      targetAmount,
+      monthlyPercentage: percentage 
+    }]);
+    setNewGoalName('');
+    setNewGoalAmount('');
+    setNewGoalPercentage('15');
+    toast.success("Goal added!");
+  };
+
+  const handleRemoveGoal = (id: string) => {
+    setGoals(goals.filter(g => g.id !== id));
+  };
+
   const handleNext = () => {
     if (step === 1) {
       const result = salarySchema.safeParse({
@@ -338,6 +410,11 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       otherIncome: other,
       emis,
       expenses,
+      goals: goals.map(g => ({
+        name: g.name,
+        targetAmount: g.targetAmount,
+        monthlyPercentage: g.monthlyPercentage,
+      })),
     });
   };
 
@@ -527,6 +604,103 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
       case 4:
         return (
           <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <Input
+                placeholder="Goal Name (e.g., Buy a Plot)"
+                value={newGoalName}
+                onChange={(e) => setNewGoalName(e.target.value.slice(0, 50))}
+                maxLength={50}
+                className="md:col-span-1"
+              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                <Input
+                  type="number"
+                  placeholder="Target Amount"
+                  value={newGoalAmount}
+                  onChange={(e) => setNewGoalAmount(e.target.value)}
+                  className="pl-7"
+                  min="1"
+                />
+              </div>
+              <div className="relative">
+                <Input
+                  type="number"
+                  placeholder="15"
+                  value={newGoalPercentage}
+                  onChange={(e) => setNewGoalPercentage(e.target.value)}
+                  min="1"
+                  max="100"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">%/month</span>
+              </div>
+              <Button onClick={handleAddGoal} className="bg-pink-500 hover:bg-pink-600 text-white">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Goal
+              </Button>
+            </div>
+
+            {totalIncome > 0 && newGoalAmount && newGoalPercentage && (
+              <div className="p-3 rounded-lg bg-pink-500/10 border border-pink-500/30 text-sm">
+                <span className="text-muted-foreground">Monthly contribution: </span>
+                <span className="font-bold text-pink-500">
+                  ${((totalIncome * (parseFloat(newGoalPercentage) || 0)) / 100).toLocaleString()}
+                </span>
+                {parseFloat(newGoalAmount) > 0 && (
+                  <>
+                    <span className="text-muted-foreground"> • Time to achieve: </span>
+                    <span className="font-bold text-pink-500">
+                      {Math.ceil(parseFloat(newGoalAmount) / ((totalIncome * (parseFloat(newGoalPercentage) || 1)) / 100))} months
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-2 max-h-[150px] overflow-y-auto">
+              {goals.map((goal) => {
+                const monthlyContrib = (totalIncome * goal.monthlyPercentage) / 100;
+                const monthsToGoal = monthlyContrib > 0 ? Math.ceil(goal.targetAmount / monthlyContrib) : 0;
+                return (
+                  <motion.div
+                    key={goal.id}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center justify-between p-3 rounded-lg bg-pink-500/10 border border-pink-500/30"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Target className="h-4 w-4 text-pink-500" />
+                      <div>
+                        <span className="font-medium">{goal.name}</span>
+                        <span className="text-xs text-muted-foreground ml-2">
+                          ${goal.targetAmount.toLocaleString()} • {goal.monthlyPercentage}%/mo • ~{monthsToGoal}mo
+                        </span>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveGoal(goal.id)}
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {goals.length === 0 && (
+              <p className="text-center text-muted-foreground py-2 text-sm">
+                No goals yet? Add your dreams like buying a plot, car, or building an emergency fund!
+              </p>
+            )}
+          </div>
+        );
+      
+      case 5:
+        return (
+          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
                 <p className="text-sm text-muted-foreground">Total Income</p>
@@ -548,10 +722,17 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
               <Progress value={Math.max(0, Math.min(100, savingsRate))} className="h-3" />
               <p className="text-xs text-muted-foreground mt-2">Target: 20% or more for financial health</p>
             </div>
+
+            {goals.length > 0 && (
+              <div className="p-4 rounded-lg bg-pink-500/10 border border-pink-500/30">
+                <p className="text-sm text-muted-foreground mb-1">Goal Allocation</p>
+                <p className="font-bold text-pink-500">${totalGoalContribution.toLocaleString()}/month ({totalGoalPercentage}%)</p>
+              </div>
+            )}
           </div>
         );
       
-      case 5:
+      case 6:
         const monthlyProjection = remainingAfterAll;
         return (
           <div className="space-y-4">
@@ -587,7 +768,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
           </div>
         );
       
-      case 6:
+      case 7:
         return (
           <div className="space-y-3">
             {emiToIncomeRatio > 40 && (

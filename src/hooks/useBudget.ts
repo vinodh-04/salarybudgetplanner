@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { Expense, Income, BudgetPlan, ExpenseCategory } from '@/types/budget';
+import { Expense, Income, BudgetPlan, ExpenseCategory, SavingsGoal } from '@/types/budget';
 
 const generateId = () => Math.random().toString(36).substring(2, 11);
 
@@ -8,6 +8,7 @@ interface OnboardingData {
   otherIncome: number;
   emis: Array<{ id: string; name: string; amount: number }>;
   expenses: Array<{ id: string; name: string; amount: number; category: string }>;
+  goals?: Array<{ name: string; targetAmount: number; monthlyPercentage: number }>;
 }
 
 function createInitialExpenses(data?: OnboardingData): Expense[] {
@@ -61,6 +62,17 @@ export function useBudget(initialData?: OnboardingData) {
   const [savingsGoal, setSavingsGoal] = useState(() => 
     initialData ? Math.round((initialData.monthlySalary + initialData.otherIncome) * 0.2) : 500
   );
+  const [goals, setGoals] = useState<SavingsGoal[]>(() => {
+    if (!initialData?.goals) return [];
+    return initialData.goals.map(g => ({
+      id: generateId(),
+      name: g.name,
+      targetAmount: g.targetAmount,
+      monthlyPercentage: g.monthlyPercentage,
+      currentSaved: 0,
+      createdAt: new Date().toISOString(),
+    }));
+  });
 
   const addExpense = useCallback((expense: Omit<Expense, 'id'>) => {
     setExpenses(prev => [...prev, { ...expense, id: generateId() }]);
@@ -153,8 +165,9 @@ export function useBudget(initialData?: OnboardingData) {
       categoryBudgets,
       recommendations,
       predictions,
+      goals,
     };
-  }, [expenses, income, savingsGoal]);
+  }, [expenses, income, savingsGoal, goals]);
 
   const expensesByCategory = useMemo(() => {
     return expenses.reduce((acc, expense) => {
@@ -166,10 +179,30 @@ export function useBudget(initialData?: OnboardingData) {
     }, {} as Record<ExpenseCategory, Expense[]>);
   }, [expenses]);
 
+  const addGoal = useCallback((goal: Omit<SavingsGoal, 'id' | 'currentSaved' | 'createdAt'>) => {
+    setGoals(prev => [...prev, {
+      ...goal,
+      id: generateId(),
+      currentSaved: 0,
+      createdAt: new Date().toISOString(),
+    }]);
+  }, []);
+
+  const removeGoal = useCallback((id: string) => {
+    setGoals(prev => prev.filter(g => g.id !== id));
+  }, []);
+
+  const contributeToGoal = useCallback((id: string, amount: number) => {
+    setGoals(prev => prev.map(g => 
+      g.id === id ? { ...g, currentSaved: g.currentSaved + amount } : g
+    ));
+  }, []);
+
   return {
     expenses,
     income,
     savingsGoal,
+    goals,
     budgetPlan,
     expensesByCategory,
     addExpense,
@@ -177,5 +210,8 @@ export function useBudget(initialData?: OnboardingData) {
     addIncome,
     removeIncome,
     setSavingsGoal,
+    addGoal,
+    removeGoal,
+    contributeToGoal,
   };
 }
