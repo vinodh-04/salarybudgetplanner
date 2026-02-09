@@ -36,10 +36,23 @@ export function Recommendations({ recommendations }: RecommendationsProps) {
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: index * 0.1 }}
-          className="flex items-start gap-3 p-4 rounded-lg bg-secondary/30 border border-border/30"
+          whileHover={{ x: 4, scale: 1.01 }}
+          className="group flex items-start gap-3 p-4 rounded-lg bg-secondary/30 border border-border/30 cursor-pointer transition-all duration-300 hover:bg-secondary/50 hover:border-primary/30 hover:shadow-md"
         >
-          <div className="mt-0.5">{getIcon(rec)}</div>
-          <p className="text-sm text-foreground leading-relaxed">{rec}</p>
+          <motion.div 
+            className="mt-0.5 transition-transform duration-300 group-hover:scale-110"
+            whileHover={{ rotate: 15 }}
+          >
+            {getIcon(rec)}
+          </motion.div>
+          <p className="text-sm text-foreground leading-relaxed group-hover:text-primary/90 transition-colors">{rec}</p>
+          
+          {/* Hover indicator */}
+          <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-primary">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
         </motion.div>
       ))}
     </div>

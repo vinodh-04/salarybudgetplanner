@@ -187,12 +187,19 @@ export function SavingsGoalTracker({
                   key={goal.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-4 rounded-lg bg-gradient-to-br from-primary/5 to-accent/5 border border-border/50"
+                  whileHover={{ scale: 1.01, y: -2 }}
+                  className="group p-4 rounded-lg bg-gradient-to-br from-primary/5 to-accent/5 border border-border/50 transition-all duration-300 hover:shadow-lg hover:border-primary/30"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h4 className="font-semibold flex items-center gap-2">
-                        <span className="text-lg">🎯</span>
+                      <h4 className="font-semibold flex items-center gap-2 group-hover:text-primary transition-colors">
+                        <motion.span 
+                          className="text-lg"
+                          animate={{ rotate: [0, -10, 10, 0] }}
+                          transition={{ repeat: Infinity, duration: 2, delay: Math.random() * 2 }}
+                        >
+                          🎯
+                        </motion.span>
                         {goal.name}
                       </h4>
                       <p className="text-sm text-muted-foreground">
@@ -202,7 +209,7 @@ export function SavingsGoalTracker({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-300"
                       onClick={() => onRemoveGoal(goal.id)}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -213,9 +220,24 @@ export function SavingsGoalTracker({
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Progress</span>
-                      <span className="font-medium">{progress.toFixed(1)}%</span>
+                      <motion.span 
+                        className="font-medium"
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ repeat: Infinity, duration: 2 }}
+                      >
+                        {progress.toFixed(1)}%
+                      </motion.span>
                     </div>
-                    <Progress value={Math.min(100, progress)} className="h-3" />
+                    <div className="h-3 w-full rounded-full bg-secondary overflow-hidden relative">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${Math.min(100, progress)}%` }}
+                        transition={{ duration: 1, ease: 'easeOut' }}
+                        className={`h-full rounded-full ${progress >= 75 ? 'bg-emerald-500' : progress >= 50 ? 'bg-cyan-500' : progress >= 25 ? 'bg-amber-500' : 'bg-primary'} relative overflow-hidden`}
+                      >
+                        <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                      </motion.div>
+                    </div>
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <span>${goal.currentSaved.toLocaleString()} saved</span>
                       <span>${goal.targetAmount.toLocaleString()} goal</span>
@@ -224,7 +246,10 @@ export function SavingsGoalTracker({
 
                   {/* Time Estimate */}
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 rounded-lg bg-background/50 border border-border/30">
+                    <motion.div 
+                      className="p-3 rounded-lg bg-background/50 border border-border/30 transition-all duration-300 hover:border-primary/30 hover:bg-primary/5"
+                      whileHover={{ scale: 1.02 }}
+                    >
                       <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
                         <TrendingUp className="h-3 w-3" />
                         Monthly Contribution
@@ -232,22 +257,31 @@ export function SavingsGoalTracker({
                       <p className="font-semibold text-primary">
                         ${(timeData.monthlyContribution || 0).toLocaleString()}
                       </p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-background/50 border border-border/30">
+                    </motion.div>
+                    <motion.div 
+                      className="p-3 rounded-lg bg-background/50 border border-border/30 transition-all duration-300 hover:border-cyan-500/30 hover:bg-cyan-500/5"
+                      whileHover={{ scale: 1.02 }}
+                    >
                       <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
                         <Calendar className="h-3 w-3" />
                         Time to Achieve
                       </div>
-                      <p className="font-semibold text-cyan-500">
+                      <p className="font-semibold text-cyan-600 dark:text-cyan-400">
                         {progress >= 100 ? (
-                          <span className="text-emerald-500">🎉 Achieved!</span>
+                          <motion.span 
+                            className="text-emerald-500"
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{ repeat: Infinity, duration: 1 }}
+                          >
+                            🎉 Achieved!
+                          </motion.span>
                         ) : timeData.years && timeData.years > 0 ? (
                           `${timeData.years}y ${timeData.remainingMonths}m`
                         ) : (
                           `${timeData.months} months`
                         )}
                       </p>
-                    </div>
+                    </motion.div>
                   </div>
 
                   {/* Quick Contribute Button */}
