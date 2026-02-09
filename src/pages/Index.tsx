@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Wallet, Bot, TrendingUp, PieChart } from 'lucide-react';
+import { Wallet, Bot, TrendingUp, PieChart, Settings } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { BudgetOverview } from '@/components/BudgetOverview';
 import { ExpenseChart } from '@/components/ExpenseChart';
 import { IncomeExpenseChart } from '@/components/IncomeExpenseChart';
@@ -10,9 +12,17 @@ import { AddExpenseForm } from '@/components/AddExpenseForm';
 import { AddIncomeForm } from '@/components/AddIncomeForm';
 import { Recommendations } from '@/components/Recommendations';
 import { AIChat } from '@/components/AIChat';
+import { OnboardingWizard } from '@/components/OnboardingWizard';
 import { useBudget } from '@/hooks/useBudget';
 
-const Index = () => {
+interface OnboardingData {
+  monthlySalary: number;
+  otherIncome: number;
+  emis: Array<{ id: string; name: string; amount: number }>;
+  expenses: Array<{ id: string; name: string; amount: number; category: string }>;
+}
+
+const Dashboard = ({ initialData, onReset }: { initialData: OnboardingData; onReset: () => void }) => {
   const {
     expenses,
     income,
@@ -20,7 +30,7 @@ const Index = () => {
     addExpense,
     removeExpense,
     addIncome,
-  } = useBudget();
+  } = useBudget(initialData);
 
   return (
     <div className="min-h-screen bg-background">
@@ -41,17 +51,23 @@ const Index = () => {
                 <p className="text-sm text-muted-foreground">AI-Powered Financial Assistant</p>
               </div>
             </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm"
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-              </span>
-              <span>6 AI Agents Active</span>
-            </motion.div>
+            <div className="flex items-center gap-3">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                </span>
+                <span>6 AI Agents Active</span>
+              </motion.div>
+              <Button variant="outline" size="sm" onClick={onReset}>
+                <Settings className="h-4 w-4 mr-2" />
+                Reset
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -126,20 +142,20 @@ const Index = () => {
                   <CardDescription>Track and categorize your spending</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Tabs defaultValue="add" className="w-full">
+                  <Tabs defaultValue="list" className="w-full">
                     <TabsList className="grid w-full grid-cols-3 mb-4">
+                      <TabsTrigger value="list">All Expenses ({expenses.length})</TabsTrigger>
                       <TabsTrigger value="add">Add Expense</TabsTrigger>
                       <TabsTrigger value="income">Add Income</TabsTrigger>
-                      <TabsTrigger value="list">View All ({expenses.length})</TabsTrigger>
                     </TabsList>
+                    <TabsContent value="list">
+                      <ExpenseList expenses={expenses} onRemove={removeExpense} />
+                    </TabsContent>
                     <TabsContent value="add">
                       <AddExpenseForm onAdd={addExpense} />
                     </TabsContent>
                     <TabsContent value="income">
                       <AddIncomeForm onAdd={addIncome} />
-                    </TabsContent>
-                    <TabsContent value="list">
-                      <ExpenseList expenses={expenses} onRemove={removeExpense} />
                     </TabsContent>
                   </Tabs>
                 </CardContent>
@@ -200,6 +216,24 @@ const Index = () => {
       </footer>
     </div>
   );
+};
+
+const Index = () => {
+  const [onboardingData, setOnboardingData] = useState<OnboardingData | null>(null);
+
+  const handleOnboardingComplete = (data: OnboardingData) => {
+    setOnboardingData(data);
+  };
+
+  const handleReset = () => {
+    setOnboardingData(null);
+  };
+
+  if (!onboardingData) {
+    return <OnboardingWizard onComplete={handleOnboardingComplete} />;
+  }
+
+  return <Dashboard initialData={onboardingData} onReset={handleReset} />;
 };
 
 export default Index;
