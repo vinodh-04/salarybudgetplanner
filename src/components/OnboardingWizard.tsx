@@ -920,7 +920,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
               {step < totalSteps ? (
                 <Button 
                   onClick={handleNext} 
-                  className={`${currentAgent.color.replace('text-', 'bg-')} hover:opacity-90 text-white`}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
                   Next
                   <ArrowRight className="h-4 w-4 ml-2" />
