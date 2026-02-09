@@ -825,28 +825,57 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   // Intro page (step 0)
   if (step === 0) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div 
+        className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, #0a1628 0%, #1a0a2e 50%, #0a1628 100%)',
+        }}
+      >
+        {/* Animated blue neon background effects */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.6, 0.3],
+            }}
+            transition={{ duration: 4, repeat: Infinity }}
+            className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl"
+            style={{ background: 'radial-gradient(circle, rgba(0, 150, 255, 0.4) 0%, transparent 70%)' }}
+          />
+          <motion.div
+            animate={{
+              scale: [1.2, 1, 1.2],
+              opacity: [0.4, 0.7, 0.4],
+            }}
+            transition={{ duration: 5, repeat: Infinity, delay: 1 }}
+            className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl"
+            style={{ background: 'radial-gradient(circle, rgba(0, 200, 255, 0.5) 0%, transparent 70%)' }}
+          />
+          <motion.div
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.2, 0.5, 0.2],
+            }}
+            transition={{ duration: 6, repeat: Infinity, delay: 2 }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl"
+            style={{ background: 'radial-gradient(circle, rgba(0, 180, 255, 0.3) 0%, transparent 60%)' }}
+          />
+        </div>
+
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, type: "spring" }}
-          className="text-center space-y-12"
+          className="text-center space-y-12 relative z-10"
         >
-          {/* Neon Title */}
+          {/* White Title with blue neon glow */}
           <motion.h1
             initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="text-4xl md:text-6xl lg:text-7xl font-display font-bold tracking-tight"
+            className="text-4xl md:text-6xl lg:text-7xl font-display font-bold tracking-tight text-white"
             style={{
-              background: 'linear-gradient(135deg, #00ff88, #00d4ff, #ff00ff, #ffff00)',
-              backgroundSize: '300% 300%',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              animation: 'neonGradient 3s ease infinite',
-              textShadow: '0 0 30px rgba(0, 255, 136, 0.5), 0 0 60px rgba(0, 212, 255, 0.3), 0 0 90px rgba(255, 0, 255, 0.2)',
-              filter: 'drop-shadow(0 0 20px rgba(0, 255, 136, 0.4))',
+              textShadow: '0 0 20px rgba(0, 180, 255, 0.8), 0 0 40px rgba(0, 150, 255, 0.6), 0 0 60px rgba(0, 200, 255, 0.4), 0 0 80px rgba(0, 180, 255, 0.3)',
             }}
           >
             MINI BUDGET PLANNER
@@ -854,7 +883,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             <span className="text-3xl md:text-5xl lg:text-6xl">WITH AGENTIC AI</span>
           </motion.h1>
 
-          {/* Neon glow effect decoration */}
+          {/* Blue neon glow effect decoration */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -875,14 +904,14 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                 }}
                 className="w-3 h-3 rounded-full"
                 style={{
-                  background: ['#00ff88', '#00d4ff', '#ff00ff', '#ffff00', '#00ff88'][i],
-                  boxShadow: `0 0 20px ${['#00ff88', '#00d4ff', '#ff00ff', '#ffff00', '#00ff88'][i]}, 0 0 40px ${['#00ff88', '#00d4ff', '#ff00ff', '#ffff00', '#00ff88'][i]}`,
+                  background: '#00d4ff',
+                  boxShadow: '0 0 20px #00d4ff, 0 0 40px #00d4ff, 0 0 60px #0096ff',
                 }}
               />
             ))}
           </motion.div>
 
-          {/* Next Button with neon styling */}
+          {/* Next Button with blue neon styling */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -891,12 +920,12 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
             <Button
               onClick={() => setStep(1)}
               size="lg"
-              className="text-lg px-12 py-6 h-auto font-display font-bold relative overflow-hidden group"
+              className="text-lg px-12 py-6 h-auto font-display font-bold relative overflow-hidden group border-2"
               style={{
-                background: 'linear-gradient(135deg, #00ff88, #00d4ff)',
-                boxShadow: '0 0 30px rgba(0, 255, 136, 0.5), 0 0 60px rgba(0, 212, 255, 0.3)',
-                color: '#000',
-                border: '2px solid transparent',
+                background: 'transparent',
+                boxShadow: '0 0 20px rgba(0, 212, 255, 0.5), 0 0 40px rgba(0, 150, 255, 0.3), inset 0 0 20px rgba(0, 212, 255, 0.1)',
+                color: '#fff',
+                borderColor: '#00d4ff',
               }}
             >
               <span className="relative z-10 flex items-center gap-2">
@@ -904,21 +933,13 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                 <ArrowRight className="h-5 w-5" />
               </span>
               <motion.div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 style={{
-                  background: 'linear-gradient(135deg, #00d4ff, #ff00ff)',
+                  background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(0, 150, 255, 0.2))',
                 }}
               />
             </Button>
           </motion.div>
-
-          {/* CSS for neon gradient animation */}
-          <style>{`
-            @keyframes neonGradient {
-              0%, 100% { background-position: 0% 50%; }
-              50% { background-position: 100% 50%; }
-            }
-          `}</style>
         </motion.div>
       </div>
     );
