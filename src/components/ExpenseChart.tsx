@@ -56,11 +56,14 @@ export function ExpenseChart({ categoryBudgets }: ExpenseChartProps) {
           <Tooltip
             formatter={(value: number) => [`$${value.toLocaleString()}`, '']}
             contentStyle={{
-              backgroundColor: 'hsl(40 20% 99%)',
-              border: '1px solid hsl(155 15% 88%)',
+              backgroundColor: 'hsl(220 50% 12%)',
+              border: '1px solid hsl(195 100% 50% / 0.3)',
               borderRadius: '0.75rem',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+              boxShadow: '0 0 20px hsl(195 100% 50% / 0.2)',
+              color: '#fff',
             }}
+            labelStyle={{ color: '#fff' }}
+            itemStyle={{ color: '#fff' }}
           />
           <Legend
             layout="horizontal"
