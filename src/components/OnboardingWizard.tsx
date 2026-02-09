@@ -825,12 +825,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   // Intro page (step 0)
   if (step === 0) {
     return (
-      <div 
-        className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
-        style={{
-          background: 'linear-gradient(135deg, #0a1628 0%, #1a0a2e 50%, #0a1628 100%)',
-        }}
-      >
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
         {/* Animated blue neon background effects */}
         <div className="absolute inset-0 overflow-hidden">
           <motion.div
