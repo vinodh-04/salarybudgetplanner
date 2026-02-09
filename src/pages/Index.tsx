@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Wallet, Bot, TrendingUp, PieChart, Settings } from 'lucide-react';
+import { DollarSign, Bot, TrendingUp, PieChart, Settings } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -48,15 +48,15 @@ const Dashboard = ({ initialData, onReset }: { initialData: OnboardingData; onRe
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center gap-3 group cursor-pointer"
             >
-              <motion.div 
-                className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-glow transition-all duration-300 group-hover:shadow-xl group-hover:scale-105"
-                whileHover={{ rotate: [0, -5, 5, 0] }}
-                transition={{ duration: 0.5 }}
-              >
-                <Wallet className="h-5 w-5 text-primary-foreground" />
+               <motion.div 
+                 className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-glow transition-all duration-300 group-hover:shadow-xl group-hover:scale-105"
+                 whileHover={{ rotate: [0, -5, 5, 0] }}
+                 transition={{ duration: 0.5 }}
+               >
+                 <DollarSign className="h-5 w-5 text-primary-foreground" />
               </motion.div>
               <div>
-                <h1 className="text-xl font-display font-bold text-foreground group-hover:text-primary transition-colors">Micro-Budget Planner</h1>
+                <h1 className="text-xl font-display font-bold text-foreground group-hover:text-primary transition-colors">Budget Planner</h1>
                 <p className="text-sm text-muted-foreground">AI-Powered Financial Assistant</p>
               </div>
             </motion.div>
