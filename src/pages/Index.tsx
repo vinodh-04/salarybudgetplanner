@@ -13,6 +13,7 @@ import { AddIncomeForm } from '@/components/AddIncomeForm';
 import { Recommendations } from '@/components/Recommendations';
 import { AIChat } from '@/components/AIChat';
 import { OnboardingWizard } from '@/components/OnboardingWizard';
+import { SavingsGoalTracker } from '@/components/SavingsGoalTracker';
 import { useBudget } from '@/hooks/useBudget';
 
 interface OnboardingData {
@@ -20,6 +21,7 @@ interface OnboardingData {
   otherIncome: number;
   emis: Array<{ id: string; name: string; amount: number }>;
   expenses: Array<{ id: string; name: string; amount: number; category: string }>;
+  goals?: Array<{ name: string; targetAmount: number; monthlyPercentage: number }>;
 }
 
 const Dashboard = ({ initialData, onReset }: { initialData: OnboardingData; onReset: () => void }) => {
@@ -30,6 +32,9 @@ const Dashboard = ({ initialData, onReset }: { initialData: OnboardingData; onRe
     addExpense,
     removeExpense,
     addIncome,
+    addGoal,
+    removeGoal,
+    contributeToGoal,
   } = useBudget(initialData);
 
   return (
@@ -61,7 +66,7 @@ const Dashboard = ({ initialData, onReset }: { initialData: OnboardingData; onRe
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                 </span>
-                <span>6 AI Agents Active</span>
+                <span>7 AI Agents Active</span>
               </motion.div>
               <Button variant="outline" size="sm" onClick={onReset}>
                 <Settings className="h-4 w-4 mr-2" />
@@ -163,8 +168,24 @@ const Dashboard = ({ initialData, onReset }: { initialData: OnboardingData; onRe
             </motion.div>
           </div>
 
-          {/* Right Column - AI Assistant & Recommendations */}
+          {/* Right Column - AI Assistant & Goals */}
           <div className="space-y-6">
+            {/* Savings Goals Tracker */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.25 }}
+            >
+              <SavingsGoalTracker
+                goals={budgetPlan.goals}
+                monthlyIncome={budgetPlan.totalIncome}
+                monthlySavings={budgetPlan.savings}
+                onAddGoal={addGoal}
+                onRemoveGoal={removeGoal}
+                onContributeToGoal={contributeToGoal}
+              />
+            </motion.div>
+
             {/* AI Chat */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}

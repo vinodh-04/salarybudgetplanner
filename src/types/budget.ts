@@ -26,6 +26,15 @@ export interface Income {
   date: string;
 }
 
+export interface SavingsGoal {
+  id: string;
+  name: string;
+  targetAmount: number;
+  monthlyPercentage: number;
+  currentSaved: number;
+  createdAt: string;
+}
+
 export interface BudgetPlan {
   totalIncome: number;
   totalExpenses: number;
@@ -34,6 +43,7 @@ export interface BudgetPlan {
   categoryBudgets: Record<ExpenseCategory, number>;
   recommendations: string[];
   predictions: SpendingPrediction[];
+  goals: SavingsGoal[];
 }
 
 export interface SpendingPrediction {
