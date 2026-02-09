@@ -10,11 +10,10 @@ interface OnboardingData {
   expenses: Array<{ id: string; name: string; amount: number; category: string }>;
 }
 
-export function useBudget(initialData?: OnboardingData) {
-  // Convert onboarding data to expenses/income format
-  const initialExpenses: Expense[] = initialData ? [
-    // Add EMIs as housing/other expenses
-    ...initialData.emis.map(emi => ({
+function createInitialExpenses(data?: OnboardingData): Expense[] {
+  if (!data) return [];
+  return [
+    ...data.emis.map(emi => ({
       id: emi.id,
       category: 'other' as ExpenseCategory,
       amount: emi.amount,
@@ -22,8 +21,7 @@ export function useBudget(initialData?: OnboardingData) {
       date: new Date().toISOString().split('T')[0],
       isRecurring: true,
     })),
-    // Add other expenses
-    ...initialData.expenses.map(exp => ({
+    ...data.expenses.map(exp => ({
       id: exp.id,
       category: (exp.category || 'other') as ExpenseCategory,
       amount: exp.amount,
@@ -31,28 +29,38 @@ export function useBudget(initialData?: OnboardingData) {
       date: new Date().toISOString().split('T')[0],
       isRecurring: true,
     })),
-  ] : [];
+  ];
+}
 
-  const initialIncome: Income[] = initialData ? [
+function createInitialIncome(data?: OnboardingData): Income[] {
+  if (!data) return [];
+  const incomeList: Income[] = [
     {
       id: generateId(),
       source: 'Monthly Salary',
-      amount: initialData.monthlySalary,
+      amount: data.monthlySalary,
       isRecurring: true,
       date: new Date().toISOString().split('T')[0],
     },
-    ...(initialData.otherIncome > 0 ? [{
+  ];
+  if (data.otherIncome > 0) {
+    incomeList.push({
       id: generateId(),
       source: 'Other Income',
-      amount: initialData.otherIncome,
+      amount: data.otherIncome,
       isRecurring: true,
       date: new Date().toISOString().split('T')[0],
-    }] : []),
-  ] : [];
+    });
+  }
+  return incomeList;
+}
 
-  const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
-  const [income, setIncome] = useState<Income[]>(initialIncome);
-  const [savingsGoal, setSavingsGoal] = useState(initialData ? Math.round((initialData.monthlySalary + initialData.otherIncome) * 0.2) : 500);
+export function useBudget(initialData?: OnboardingData) {
+  const [expenses, setExpenses] = useState<Expense[]>(() => createInitialExpenses(initialData));
+  const [income, setIncome] = useState<Income[]>(() => createInitialIncome(initialData));
+  const [savingsGoal, setSavingsGoal] = useState(() => 
+    initialData ? Math.round((initialData.monthlySalary + initialData.otherIncome) * 0.2) : 500
+  );
 
   const addExpense = useCallback((expense: Omit<Expense, 'id'>) => {
     setExpenses(prev => [...prev, { ...expense, id: generateId() }]);
@@ -97,29 +105,32 @@ export function useBudget(initialData?: OnboardingData) {
     // EMI-specific recommendations
     const emiExpenses = expenses.filter(e => e.description.startsWith('EMI:'));
     const totalEmis = emiExpenses.reduce((sum, e) => sum + e.amount, 0);
-    const emiRatio = (totalEmis / totalIncome) * 100;
     
-    if (emiRatio > 50) {
-      recommendations.push(`⚠️ Your EMI payments are ${emiRatio.toFixed(0)}% of income. Banks recommend keeping EMIs under 50% of income.`);
-    } else if (emiRatio > 30) {
-      recommendations.push(`💳 EMI payments take up ${emiRatio.toFixed(0)}% of your income. Consider paying off smaller loans first.`);
+    if (totalIncome > 0) {
+      const emiRatio = (totalEmis / totalIncome) * 100;
+      
+      if (emiRatio > 50) {
+        recommendations.push(`⚠️ Your EMI payments are ${emiRatio.toFixed(0)}% of income. Banks recommend keeping EMIs under 50% of income.`);
+      } else if (emiRatio > 30) {
+        recommendations.push(`💳 EMI payments take up ${emiRatio.toFixed(0)}% of your income. Consider paying off smaller loans first.`);
+      }
+
+      const entertainmentRatio = (categoryBudgets.entertainment / totalIncome) * 100;
+      if (entertainmentRatio > 10) {
+        recommendations.push(`Entertainment spending is ${entertainmentRatio.toFixed(1)}% of income. Try to keep it under 10%.`);
+      }
+
+      const housingRatio = (categoryBudgets.housing / totalIncome) * 100;
+      if (housingRatio > 35) {
+        recommendations.push(`Housing costs are ${housingRatio.toFixed(1)}% of income. The recommended max is 30-35%.`);
+      }
     }
 
     if (savings < savingsGoal) {
       recommendations.push(`You're $${(savingsGoal - savings).toLocaleString()} short of your savings goal. Consider reducing non-essential spending.`);
     }
-    
-    const entertainmentRatio = (categoryBudgets.entertainment / totalIncome) * 100;
-    if (entertainmentRatio > 10) {
-      recommendations.push(`Entertainment spending is ${entertainmentRatio.toFixed(1)}% of income. Try to keep it under 10%.`);
-    }
 
-    const housingRatio = (categoryBudgets.housing / totalIncome) * 100;
-    if (housingRatio > 35) {
-      recommendations.push(`Housing costs are ${housingRatio.toFixed(1)}% of income. The recommended max is 30-35%.`);
-    }
-
-    if (savings >= savingsGoal) {
+    if (savings >= savingsGoal && savingsGoal > 0) {
       recommendations.push(`🎉 Great job! You're meeting your savings goal of $${savingsGoal.toLocaleString()}.`);
     }
 
@@ -131,7 +142,7 @@ export function useBudget(initialData?: OnboardingData) {
       category: category as ExpenseCategory,
       predictedAmount: amount * 1.02,
       trend: amount > 200 ? 'up' as const : 'stable' as const,
-      alert: amount > totalIncome * 0.3 ? `High spending in ${category}` : undefined,
+      alert: totalIncome > 0 && amount > totalIncome * 0.3 ? `High spending in ${category}` : undefined,
     }));
 
     return {
