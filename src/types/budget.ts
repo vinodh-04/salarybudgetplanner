@@ -82,13 +82,13 @@ export const CATEGORY_LABELS: Record<ExpenseCategory, string> = {
 };
 
 export const CATEGORY_COLORS: Record<ExpenseCategory, string> = {
-  housing: 'hsl(158, 64%, 32%)',
-  food: 'hsl(38, 92%, 50%)',
-  transportation: 'hsl(200, 70%, 50%)',
-  utilities: 'hsl(280, 60%, 55%)',
-  healthcare: 'hsl(0, 72%, 51%)',
-  entertainment: 'hsl(320, 70%, 50%)',
-  shopping: 'hsl(180, 60%, 45%)',
-  savings: 'hsl(145, 60%, 45%)',
-  other: 'hsl(220, 15%, 55%)',
+  housing: '#00d4ff',      // Neon cyan
+  food: '#ff6b35',         // Neon orange
+  transportation: '#39ff14', // Neon green
+  utilities: '#ff00ff',    // Neon magenta
+  healthcare: '#ff3366',   // Neon pink
+  entertainment: '#ffff00', // Neon yellow
+  shopping: '#00ff88',     // Neon mint
+  savings: '#7b68ee',      // Neon purple
+  other: '#ffa500',        // Neon amber
 };
