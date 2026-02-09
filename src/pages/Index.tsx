@@ -46,13 +46,17 @@ const Dashboard = ({ initialData, onReset }: { initialData: OnboardingData; onRe
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-3"
+              className="flex items-center gap-3 group cursor-pointer"
             >
-              <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-glow">
+              <motion.div 
+                className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-glow transition-all duration-300 group-hover:shadow-xl group-hover:scale-105"
+                whileHover={{ rotate: [0, -5, 5, 0] }}
+                transition={{ duration: 0.5 }}
+              >
                 <Wallet className="h-5 w-5 text-primary-foreground" />
-              </div>
+              </motion.div>
               <div>
-                <h1 className="text-xl font-display font-bold text-foreground">Micro-Budget Planner</h1>
+                <h1 className="text-xl font-display font-bold text-foreground group-hover:text-primary transition-colors">Micro-Budget Planner</h1>
                 <p className="text-sm text-muted-foreground">AI-Powered Financial Assistant</p>
               </div>
             </motion.div>
@@ -60,7 +64,8 @@ const Dashboard = ({ initialData, onReset }: { initialData: OnboardingData; onRe
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm"
+                whileHover={{ scale: 1.05 }}
+                className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm cursor-pointer transition-all duration-300 hover:bg-primary/10 hover:shadow-md"
               >
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -68,8 +73,8 @@ const Dashboard = ({ initialData, onReset }: { initialData: OnboardingData; onRe
                 </span>
                 <span>7 AI Agents Active</span>
               </motion.div>
-              <Button variant="outline" size="sm" onClick={onReset}>
-                <Settings className="h-4 w-4 mr-2" />
+              <Button variant="outline" size="sm" onClick={onReset} className="group">
+                <Settings className="h-4 w-4 mr-2 transition-transform duration-300 group-hover:rotate-90" />
                 Reset
               </Button>
             </div>
@@ -96,16 +101,20 @@ const Dashboard = ({ initialData, onReset }: { initialData: OnboardingData; onRe
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
+                whileHover={{ y: -4 }}
               >
-                <Card className="border-border/50 shadow-md">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-display flex items-center gap-2">
-                      <PieChart className="h-5 w-5 text-primary" />
+                <Card className="group border-border/50 shadow-md transition-all duration-300 hover:shadow-xl hover:border-primary/30 overflow-hidden">
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+                  <CardHeader className="pb-2 relative">
+                    <CardTitle className="text-lg font-display flex items-center gap-2 group-hover:text-primary transition-colors">
+                      <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }}>
+                        <PieChart className="h-5 w-5 text-primary" />
+                      </motion.div>
                       Spending Breakdown
                     </CardTitle>
                     <CardDescription>Where your money goes</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="relative">
                     <ExpenseChart categoryBudgets={budgetPlan.categoryBudgets} />
                   </CardContent>
                 </Card>
@@ -115,16 +124,20 @@ const Dashboard = ({ initialData, onReset }: { initialData: OnboardingData; onRe
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
+                whileHover={{ y: -4 }}
               >
-                <Card className="border-border/50 shadow-md">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-display flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-primary" />
+                <Card className="group border-border/50 shadow-md transition-all duration-300 hover:shadow-xl hover:border-primary/30 overflow-hidden">
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+                  <CardHeader className="pb-2 relative">
+                    <CardTitle className="text-lg font-display flex items-center gap-2 group-hover:text-primary transition-colors">
+                      <motion.div whileHover={{ y: -3 }} transition={{ duration: 0.3 }}>
+                        <TrendingUp className="h-5 w-5 text-primary" />
+                      </motion.div>
                       Income vs Expenses
                     </CardTitle>
                     <CardDescription>Monthly comparison</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="relative">
                     <IncomeExpenseChart
                       totalIncome={budgetPlan.totalIncome}
                       totalExpenses={budgetPlan.totalExpenses}
@@ -140,18 +153,25 @@ const Dashboard = ({ initialData, onReset }: { initialData: OnboardingData; onRe
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
+              whileHover={{ scale: 1.002 }}
             >
-              <Card className="border-border/50 shadow-md">
+              <Card className="group border-border/50 shadow-md transition-all duration-300 hover:shadow-lg hover:border-primary/20 overflow-hidden">
                 <CardHeader>
-                  <CardTitle className="text-lg font-display">Manage Expenses</CardTitle>
+                  <CardTitle className="text-lg font-display group-hover:text-primary transition-colors">Manage Expenses</CardTitle>
                   <CardDescription>Track and categorize your spending</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Tabs defaultValue="list" className="w-full">
                     <TabsList className="grid w-full grid-cols-3 mb-4">
-                      <TabsTrigger value="list">All Expenses ({expenses.length})</TabsTrigger>
-                      <TabsTrigger value="add">Add Expense</TabsTrigger>
-                      <TabsTrigger value="income">Add Income</TabsTrigger>
+                      <TabsTrigger value="list" className="transition-all duration-300 data-[state=active]:shadow-md">
+                        All Expenses ({expenses.length})
+                      </TabsTrigger>
+                      <TabsTrigger value="add" className="transition-all duration-300 data-[state=active]:shadow-md">
+                        Add Expense
+                      </TabsTrigger>
+                      <TabsTrigger value="income" className="transition-all duration-300 data-[state=active]:shadow-md">
+                        Add Income
+                      </TabsTrigger>
                     </TabsList>
                     <TabsContent value="list">
                       <ExpenseList expenses={expenses} onRemove={removeExpense} />
@@ -216,17 +236,25 @@ const Dashboard = ({ initialData, onReset }: { initialData: OnboardingData; onRe
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
+          whileHover={{ scale: 1.002 }}
           className="mt-8"
         >
-          <Card className="border-border/50 shadow-md bg-gradient-to-r from-primary/5 to-accent/5">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-display flex items-center gap-2">
-                <span className="text-xl">💡</span>
+          <Card className="group border-border/50 shadow-md bg-gradient-to-r from-primary/5 to-accent/5 transition-all duration-300 hover:shadow-xl hover:border-primary/30 overflow-hidden">
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 animate-pulse pointer-events-none" />
+            <CardHeader className="pb-3 relative">
+              <CardTitle className="text-lg font-display flex items-center gap-2 group-hover:text-primary transition-colors">
+                <motion.span 
+                  className="text-xl"
+                  animate={{ rotate: [0, -10, 10, 0] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                >
+                  💡
+                </motion.span>
                 AI Budget Tips
               </CardTitle>
               <CardDescription>Personalized recommendations from our AI agents to improve your finances</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative">
               <Recommendations recommendations={budgetPlan.recommendations} />
             </CardContent>
           </Card>
