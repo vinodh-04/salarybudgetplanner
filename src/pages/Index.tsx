@@ -1,12 +1,203 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { motion } from 'framer-motion';
+import { Wallet, Bot, TrendingUp, PieChart } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { BudgetOverview } from '@/components/BudgetOverview';
+import { ExpenseChart } from '@/components/ExpenseChart';
+import { IncomeExpenseChart } from '@/components/IncomeExpenseChart';
+import { ExpenseList } from '@/components/ExpenseList';
+import { AddExpenseForm } from '@/components/AddExpenseForm';
+import { AddIncomeForm } from '@/components/AddIncomeForm';
+import { Recommendations } from '@/components/Recommendations';
+import { AIChat } from '@/components/AIChat';
+import { useBudget } from '@/hooks/useBudget';
 
 const Index = () => {
+  const {
+    expenses,
+    income,
+    budgetPlan,
+    addExpense,
+    removeExpense,
+    addIncome,
+  } = useBudget();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b border-border/50 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-3"
+            >
+              <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-glow">
+                <Wallet className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-xl font-display font-bold text-foreground">Micro-Budget Planner</h1>
+                <p className="text-sm text-muted-foreground">AI-Powered Financial Assistant</p>
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-sm"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              </span>
+              <span>6 AI Agents Active</span>
+            </motion.div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Overview & Charts */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Overview Stats */}
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <BudgetOverview budgetPlan={budgetPlan} />
+            </motion.section>
+
+            {/* Charts */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <Card className="border-border/50 shadow-md">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg font-display flex items-center gap-2">
+                      <PieChart className="h-5 w-5 text-primary" />
+                      Spending Breakdown
+                    </CardTitle>
+                    <CardDescription>Where your money goes</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ExpenseChart categoryBudgets={budgetPlan.categoryBudgets} />
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <Card className="border-border/50 shadow-md">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg font-display flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5 text-primary" />
+                      Income vs Expenses
+                    </CardTitle>
+                    <CardDescription>Monthly comparison</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <IncomeExpenseChart
+                      totalIncome={budgetPlan.totalIncome}
+                      totalExpenses={budgetPlan.totalExpenses}
+                      savings={budgetPlan.savings}
+                    />
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+
+            {/* Expense Management */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Card className="border-border/50 shadow-md">
+                <CardHeader>
+                  <CardTitle className="text-lg font-display">Manage Expenses</CardTitle>
+                  <CardDescription>Track and categorize your spending</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Tabs defaultValue="add" className="w-full">
+                    <TabsList className="grid w-full grid-cols-3 mb-4">
+                      <TabsTrigger value="add">Add Expense</TabsTrigger>
+                      <TabsTrigger value="income">Add Income</TabsTrigger>
+                      <TabsTrigger value="list">View All ({expenses.length})</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="add">
+                      <AddExpenseForm onAdd={addExpense} />
+                    </TabsContent>
+                    <TabsContent value="income">
+                      <AddIncomeForm onAdd={addIncome} />
+                    </TabsContent>
+                    <TabsContent value="list">
+                      <ExpenseList expenses={expenses} onRemove={removeExpense} />
+                    </TabsContent>
+                  </Tabs>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+
+          {/* Right Column - AI Assistant & Recommendations */}
+          <div className="space-y-6">
+            {/* AI Chat */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <Card className="border-border/50 shadow-md overflow-hidden">
+                <CardHeader className="pb-0 gradient-primary">
+                  <CardTitle className="text-lg font-display flex items-center gap-2 text-primary-foreground">
+                    <Bot className="h-5 w-5" />
+                    AI Budget Assistant
+                  </CardTitle>
+                  <CardDescription className="text-primary-foreground/80">
+                    Multi-agent system at your service
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <AIChat budgetPlan={budgetPlan} expenses={expenses} />
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* AI Recommendations */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Card className="border-border/50 shadow-md">
+                <CardHeader>
+                  <CardTitle className="text-lg font-display flex items-center gap-2">
+                    <span className="text-xl">💡</span>
+                    AI Recommendations
+                  </CardTitle>
+                  <CardDescription>Personalized insights from our agents</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Recommendations recommendations={budgetPlan.recommendations} />
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border/50 mt-12 py-6 text-center text-sm text-muted-foreground">
+        <p>Powered by AI Multi-Agent System • Built for smart budgeting</p>
+      </footer>
     </div>
   );
 };
