@@ -58,7 +58,7 @@ const AGENTS = [
     color: "text-blue-500",
     bgColor: "bg-blue-500/10",
     borderColor: "border-blue-500/30",
-    purpose: "I collect and validate your financial data. Enter your monthly income sources so I can organize everything properly.",
+    purpose: "Meet the Data Collection Agent — it gathers and validates your financial information. Enter your monthly income sources, and this agent will organize everything for the next step.",
     inputType: "income"
   },
   {
@@ -68,7 +68,7 @@ const AGENTS = [
     color: "text-amber-500",
     bgColor: "bg-amber-500/10",
     borderColor: "border-amber-500/30",
-    purpose: "I track all your loan commitments and EMIs. Add any recurring loan payments so I can factor them into your budget.",
+    purpose: "This is the EMI Tracker Agent — it monitors all your loan commitments and recurring payments. Add your EMIs here, and this agent will pass the data to the next stage.",
     inputType: "emi"
   },
   {
@@ -78,7 +78,7 @@ const AGENTS = [
     color: "text-purple-500",
     bgColor: "bg-purple-500/10",
     borderColor: "border-purple-500/30",
-    purpose: "I categorize and analyze your spending patterns. Add your monthly expenses and I'll identify where your money goes.",
+    purpose: "Introducing the Expense Analysis Agent — it categorizes and analyzes your spending patterns. Add your monthly expenses, and this agent will identify where your money goes before handing off to the next agent.",
     inputType: "expenses"
   },
   {
@@ -88,7 +88,7 @@ const AGENTS = [
     color: "text-emerald-500",
     bgColor: "bg-emerald-500/10",
     borderColor: "border-emerald-500/30",
-    purpose: "I create optimized budget allocations based on your income and expenses. Review my analysis of your financial health.",
+    purpose: "Here is the Budget Planning Agent — it creates optimized budget allocations based on your income and expenses. Review the analysis, then this agent will serve the data to the Prediction Agent.",
     inputType: "analysis"
   },
   {
@@ -98,7 +98,7 @@ const AGENTS = [
     color: "text-cyan-500",
     bgColor: "bg-cyan-500/10",
     borderColor: "border-cyan-500/30",
-    purpose: "I forecast your future spending and savings potential. See my predictions based on your current data.",
+    purpose: "This is the Prediction Agent — it forecasts your future spending and savings potential based on current data. Once reviewed, this agent will hand off to the Recommendation Agent.",
     inputType: "prediction"
   },
   {
@@ -108,7 +108,7 @@ const AGENTS = [
     color: "text-orange-500",
     bgColor: "bg-orange-500/10",
     borderColor: "border-orange-500/30",
-    purpose: "I provide personalized tips to reduce expenses and increase income. Here are my recommendations for you!",
+    purpose: "Finally, the Recommendation Agent — it provides personalized tips to reduce expenses and increase income. Review these suggestions to optimize your financial health!",
     inputType: "recommendations"
   }
 ];
@@ -741,7 +741,7 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
                   onClick={handleNext} 
                   className={`${currentAgent.color.replace('text-', 'bg-')} hover:opacity-90 text-white`}
                 >
-                  Next Agent
+                  Next
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               ) : (
